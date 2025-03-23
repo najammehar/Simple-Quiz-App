@@ -1,12 +1,24 @@
-// app/page.js
 "use client";
 
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import { CheckCircle, XCircle, Award, BookOpen, ChevronRight, 
          HelpCircle, AlertTriangle, Check, X, BarChart } from 'lucide-react';
 
-export default function QuizApp() {
-  const questions = [
+// Define types for our data structure
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
+interface ScoreMessage {
+  icon: JSX.Element;
+  message: string;
+  subtext: string;
+}
+
+export default function QuizApp(): JSX.Element {
+  const questions: QuizQuestion[] = [
     {
       question: "What is the capital of France?",
       options: ["London", "Berlin", "Paris", "Madrid"],
@@ -34,15 +46,15 @@ export default function QuizApp() {
     }
   ];
 
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [showScore, setShowScore] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answerStatus, setAnswerStatus] = useState(null); 
-  const [answeredQuestions, setAnsweredQuestions] = useState(Array(questions.length).fill(false));
-  const [userAnswers, setUserAnswers] = useState(Array(questions.length).fill(''));
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [score, setScore] = useState<number>(0);
+  const [showScore, setShowScore] = useState<boolean>(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [answerStatus, setAnswerStatus] = useState<'correct' | 'incorrect' | null>(null); 
+  const [answeredQuestions, setAnsweredQuestions] = useState<boolean[]>(Array(questions.length).fill(false));
+  const [userAnswers, setUserAnswers] = useState<string[]>(Array(questions.length).fill(''));
 
-  const handleAnswerClick = (option) => {
+  const handleAnswerClick = (option: string): void => {
     // Prevent re-selection
     if (selectedAnswer !== null) return;
     
@@ -66,7 +78,7 @@ export default function QuizApp() {
     }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = (): void => {
     const nextQuestion = currentQuestion + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestion(nextQuestion);
@@ -77,7 +89,7 @@ export default function QuizApp() {
     }
   };
 
-  const restartQuiz = () => {
+  const restartQuiz = (): void => {
     setCurrentQuestion(0);
     setScore(0);
     setShowScore(false);
@@ -88,7 +100,7 @@ export default function QuizApp() {
   };
 
   // Get option class based on selection and correctness
-  const getOptionClass = (option) => {
+  const getOptionClass = (option: string): string => {
     const baseClass = "p-4 rounded-lg transition-all duration-300 text-center hover:shadow-md cursor-pointer flex items-center ";
     
     if (selectedAnswer === null) {
@@ -107,12 +119,12 @@ export default function QuizApp() {
   };
 
   // Calculate percentage for gradient-based score visualization
-  const calculateScorePercentage = () => {
+  const calculateScorePercentage = (): number => {
     return (score / questions.length) * 100;
   };
 
   // Get appropriate emoji and message based on score
-  const getScoreMessage = () => {
+  const getScoreMessage = (): ScoreMessage => {
     const percentage = calculateScorePercentage();
     if (percentage === 100) return { icon: <Award size={64} className="text-yellow-500" />, message: "Perfect Score!", subtext: "Amazing job! You've mastered this quiz!" };
     if (percentage >= 80) return { icon: <Award size={64} className="text-indigo-500" />, message: "Excellent Work!", subtext: "You're doing great! Keep it up!" };
